@@ -35,12 +35,11 @@ char *messages[] = {
 	"I'm ok          ",
 	"Is this lab done",
 	"Nope not yet    ",
-	"I'm tired       ",
-	"Will I pass?    ",
-	"Not really sure ",
-	"What time is it ",
-	"Too early       "
-    // Add more messgages
+	"I'm done?       ",
+	"A few more..    ",
+	"Good to have    ",
+	"Options!        ",
+	"To test with    "
 };
 
 	//GLOBAL VARIABLES
@@ -66,7 +65,7 @@ int main(void) {
 		lcd_moveto(0,1);
 		lcd_stringout("Matt Baseheart");
 		lcd_moveto(1,4);
-		lcd_stringout("Lab 8");
+		lcd_stringout("Lab 9");
 		_delay_ms(1000);
 		lcd_writecommand(1); //clear LCD
 		
