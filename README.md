@@ -5,3 +5,9 @@ This project was run on an Arduino, where external hardware were connected to cr
 passing of an object and would calculate the speed of its travel. Corresponding information would be displayed on an LCD 
 and an alarm may be played if the maximum speed (set by a rotary encoder) was exceeded. Serial communications using UART
 protocol are also allowed from a second Arduino.
+
+
+MOTOR_CONTROL
+
+This is an example of Python programming controlling motors. This folder contains the code developed and a script developed to test
+and debug the code. This was done on a Raspberry Pi with two stepper motors attached via shield.
