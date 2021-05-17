@@ -6,7 +6,6 @@ from adafruit_motorkit import MotorKit
 kit = MotorKit(i2c=board.I2C())
 #Connect to M1 and M2 terminals
 
-# del smells like poo
 def move(x_dest, X_CURR):
     #this is assuming x_dest and y_dest are the coordinates of the center of a square if you are moving to a square
     if X_CURR >x_dest:
