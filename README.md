@@ -1,10 +1,10 @@
 AUDIO_EFFECTS
 
-This is an example of Python programming implementing audio filtering using the SciPy Library.
+This is an example of Python programming implementing audio filtering using the SciPy Library. ApplyFX.py is the main code, all other files in this directory are audio testing files.
 
 EQ
 
-This is an example of Python programming implementing audio processing using multithreading and a SoX library wrapper.
+This is an example of Python programming implementing audio processing using multithreading and a SoX library wrapper. EQ.py is the main code, all other files in this directory are for testing or providing audio files.
 
 LAB 10
 
