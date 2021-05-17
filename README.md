@@ -1,3 +1,11 @@
+AUDIO_EFFECTS
+
+This is an example of Python programming implementing audio filtering using the SciPy Library.
+
+EQ
+
+This is an example of Python programming implementing audio processing using multithreading and a SoX library wrapper.
+
 LAB 10
 
 This is an example of C programming. SpeedTrap.c is the main file used in the project, all others were used as support code.
