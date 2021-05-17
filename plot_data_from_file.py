@@ -35,7 +35,6 @@ if (xsize>0):
 	
 	plt.figure(figsize=(10,50))
 	plt.plot(xsecs, yval)
-	#plt.xticks(xsecs,np.arange(xsecs[0],xsecs[xsize-1],stepsize), rotation="vertical")
 	plt.title("Audio Activity")
 	plt.xlabel("Timestamp")
 	plt.ylabel("Noise Level(0-1023) THRES = 450")
@@ -54,7 +53,5 @@ if (xsize>0):
 
 else:
 	print("No Data Available")
-
-#os._exit(0)
 
 
