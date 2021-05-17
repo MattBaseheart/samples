@@ -1,4 +1,4 @@
-#LAB 10
+LAB 10
 
 This is an example of C programming. SpeedTrap.c is the main file used in the project, all others were used as support code.
 This project was run on an Arduino, where external hardware were connected to create a "Speed Trap". 2 Photoresitors sensed the
