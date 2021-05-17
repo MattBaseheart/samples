@@ -1,0 +1,159 @@
+/********************************************
+ *
+ *  Name: Matt Baseheart
+ *  Email: basehear@usc.edu
+ *  Section: F 12:30
+ *  Assignment: Lab 10
+ *
+ ********************************************/
+
+#include <avr/io.h>
+#include <util/delay.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <avr/interrupt.h>
+#include "lcd.h"
+#include "adc.h"
+
+// Serial communications functions and variables
+void serial_init(unsigned short);
+void serial_stringout(char *);
+void serial_txchar(char);
+
+#define FOSC 16000000           // Clock frequency
+#define BAUD 9600               // Baud rate used
+#define MYUBRR (FOSC/16/BAUD-1) // Value for UBRR0 register
+
+// ADC functions and variables
+
+#define ADC_CHAN 0              // Buttons use ADC channel 0
+
+	//GLOBAL VARIABLES
+	volatile unsigned char received[16];
+	volatile unsigned char sz = 0;
+	volatile unsigned char showMessage = 0;
+	
+	volatile unsigned char qsecs = 0;
+	
+	void variable_delay_us(int);
+	void play_note(unsigned short);
+	
+void init_timer(){
+	TCCR1B &= ~(1 << WGM13);
+	TCCR1B |= (1 << WGM12); //Set to CTC mode
+	TIMSK1 |= (1 << OCIE1A); //Enable timer Interrupt
+	OCR1A = 25000; // Load MAX count, 0.1 seconds (to 15625 = 0. 25 s with 16 MHz clock
+	TCCR1B |= (1 << CS11);// Set prescalar, start timer
+	TCCR1B |= (1 << CS10);// Set prescalar, start timer
+}
+	
+int main(void) {
+	//rotary encoder interupts
+	PCICR |= (1<<PCIE1);
+	PCMSK1 |= (1<<PCINT9);
+	PCMSK1 |= (1<<PCINT13);
+
+    // Initialize the LCD, ADC and serial modules
+		lcd_init();
+		lcd_writecommand(1); //clear LCD
+
+		adc_init();
+		
+		serial_init(MYUBRR);
+		
+		sei();
+
+    // Show the splash screen
+		lcd_moveto(0,1);
+		lcd_stringout("Matt Baseheart");
+		lcd_moveto(1,4);
+		lcd_stringout("Lab 8");
+		_delay_ms(1000);
+		lcd_writecommand(1); //clear LCD
+		
+	//Variables
+		
+    while (1) {
+
+    }
+}
+
+/* ----------------------------------------------------------------------- */
+
+void serial_init(unsigned short ubrr_value)
+{
+    // Set up USART0 registers
+		UBRR0 = MYUBRR;
+		UCSR0B |= (1 << TXEN0 | 1 << RXEN0); // Enable RX and TX
+		UCSR0C = (3 << UCSZ00); // Async., no parity,
+								// 1 stop bit, 8 data bits
+    // Enable tri-state buffer
+		DDRD |= (1<<PD3);
+		PORTB &= ~(1<<PD3);
+		
+	// Enable receiver interrupts
+		UCSR0B |= (1 << RXCIE0);   
+}
+
+void serial_txchar(char ch)
+{
+    while ((UCSR0A & (1<<UDRE0)) == 0){}
+    UDR0 = ch;
+}
+
+void serial_stringout(char *s)
+{
+    // Call serial_txchar in loop to send a string
+    // (Very similar to lcd_stringout in lcd.c)
+	int i = 0;
+    while (i<16) {
+        serial_txchar(s[i]);  // Send the character
+        i++;
+    }
+}
+
+ISR(USART_RX_vect)
+{
+	char ch;
+    ch = UDR0;                  // Get the received charater
+    // Store in buffer
+	received[sz] = ch;
+	sz++;
+    // If message complete, set flag
+	if(sz == 15){
+		showMessage = 1;
+	}
+}
+
+
+ISR(TIMER1_COMPA_vect){
+		qsecs++;
+}
+
+ISR(PCINT1_vect){
+		changed = 1;
+		input = PINC;	
+}
+
+void play_note(unsigned short freq){
+    unsigned long period;
+	int half;
+
+    period = 1000000 / freq;      // Period of note in microseconds
+	half = period/2;
+
+    while (freq--) {
+	// Make PB4 high
+        PORTB |= (1 << PB4);
+
+	// Use variable_delay_us to delay for half the period
+		variable_delay_us(half);
+	
+	// Make PB4 low
+	    PORTB &= ~(1 << PB4);
+
+	// Delay for half the period again
+		period = 1/freq;
+		variable_delay_us(half);
+    }
+}
