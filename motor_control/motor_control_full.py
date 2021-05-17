@@ -167,12 +167,6 @@ if __name__ == '__main__':
             move(0, X_CURR, 3, Y_CURR, 0)
             player = 0
 
-        #MOVE TO NEW PIECE
-        #-----------------ADD THIS-----------------#
-
-        #PICK UP PIECE
-        #-----------------ADD THIS-----------------#
-
         #MOVE TO CORRECT BEGINNING SQUARE FOR NEXT TURN
         if(player == 0):
             #Move to O starting position based on X_CURR and Y_CURR from picking up piece
