@@ -16,14 +16,10 @@ void adc_init(void)
 	ADCSRA |= (1<<ADPS0);
 	ADMUX |= (1<<ADLAR);
 	ADCSRA |= (1<<ADEN);
-	
-	//ADMUX &= ~(0x80);
-	//ADMUX |= 0x60;
 }
 
 unsigned char adc_sample(unsigned char channel)
 {
-	//_delay_ms(500);
     // Set ADC input mux bits to 'channel' value
 		ADMUX &= ~(0x0F);
 		ADMUX |= channel;
