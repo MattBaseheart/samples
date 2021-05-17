@@ -3,7 +3,7 @@
  *  Name: Matt Baseheart
  *  Email: basehear@usc.edu
  *  Section: Friday 12:30
- *  Assignment: Final Project
+ *  Assignment: Final Project EE 109
  *
  ********************************************/
 
@@ -22,22 +22,23 @@ void init_timer(){//DOES THE 16 AND 8bit TIMERS
 	//When the TCNT1 register gets to 62500 cycles, trigger interrupt
 	//Prescalar is 1024
 	//Arduino is clocking at 15625 cycles per second
-	//EXCLUDE start timer
-	TCCR1B |= (1 << WGM12); 							//Set to CTC mode
-	TIMSK1 |= (1 << OCIE1A);							//Enable timer Interrupt
-	OCR1A = 62500; 										// Load MAX count, 0.1 seconds (to 15625 = 0. 25 s with 16 MHz clock
-
-	TCCR0B |= (1 << WGM02);								//TIMER 0	
-	TIMSK0 |= (1 << OCIE0A);							//Need to set OCR0A and enable prescalar, when end turn off prescalar	
+	
+	//Set to CTC mode, Enable timer Interrupt, load MAX count 0.1 seconds (0.25 s with 16MHz clock)
+	TCCR1B |= (1 << WGM12);
+	TIMSK1 |= (1 << OCIE1A);							
+	OCR1A = 62500; 									
+	//TIMER 0, Prescalar
+	TCCR0B |= (1 << WGM02);									
+	TIMSK0 |= (1 << OCIE0A);
 }
 
 void play_note(){									
 		toneTime = 0;
 		hi = 0;
 		finished = 0;
-		OCR0A = 200; 									//Period is 400
-		TCCR0B |= (1 << CS01);							//enable prescalar
-		while(finished == 0){}							//wait
+		OCR0A = 200; 			
+		TCCR0B |= (1 << CS01);							
+		while(finished == 0){}							
 }
 
 int main(void) {
@@ -48,7 +49,8 @@ int main(void) {
 	//ROTARY ENCODER~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		
 		encoder_init(); 
-		int temp = eeprom_read_byte((void *) 100); 		//get stored max speed
+		//READ CURRENT
+		int temp = eeprom_read_byte((void *) 100); 
 		if(0<temp && temp < 100){
 			maxSpeed = temp;
 		}
@@ -57,9 +59,10 @@ int main(void) {
 		}
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	//PHOTOTRANSISTORS
-		PORTD |= (1<<PD2);								//enable pullup on photoresistors
+		//ENABLE PULLUP, get INITIAL INPUT
+		PORTD |= (1<<PD2);							
 		PORTD |= (1<<PD3);
-		photInput = PIND;								//get initial input to photoresistors
+		photInput = PIND;							
 		if(photInput &(1<<PD2))
 			firstP = 0;
 		else
@@ -70,51 +73,52 @@ int main(void) {
 		else
 			secondP = 1;
 		
-		PCICR |= (1<<PCIE2);							//Set interrupt on PORT D
+		PCICR |= (1<<PCIE2);							
 		PCMSK2 |= (1<<PCINT18);
 		PCMSK2 |= (1<<PCINT19);
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	
 	//TIMERS
 		init_timer();
-
-		DDRB |= (1<< PB5);//LED set to output
-		PORTB |= (1<<PB5); //LED turn on
-		PORTB &= ~(1<<PB5); //LED turn off 
-		c1 = 0; //initialize timer variables
+		//Set LED to output, turn it on and off once
+		DDRB |= (1<< PB5);
+		PORTB |= (1<<PB5);
+		PORTB &= ~(1<<PB5);
+		//Initialize timer variables
+		c1 = 0; 
 		c2 = 0;
 		c3 = 0;
 		c4 = 0;
 
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	//BUZZER
-		DDRB |= (1<<PB4);//Set buzzer as output
+		//Set as Output, initialize
+		DDRB |= (1<<PB4);
 		hi = 0;
-		//USE PINS
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	//SERIAL LINK
 		serial_init();
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	// Write a spash screen to the LCD
+	// Write a splash screen to the LCD, then clear
 	lcd_moveto(0,0);
 	lcd_stringout(" Matt Baseheart");
 	lcd_moveto(1,0);
 	lcd_stringout(" Final Project ");
 	_delay_ms(1000);
-	lcd_writecommand(1); //clear LCD
+	lcd_writecommand(1);
 
     while (1) {
-
 	//ENCODER
-		if (rotChanged==1) {							//rotChanged is found in interrupt
+	    	//If value was changed, update eeprom
+		if (rotChanged==1) {							
 			rotChanged = 0;
-			eeprom_update_byte((void *) 100, maxSpeed);	//Update eeprom whenever changed
+			eeprom_update_byte((void *) 100, maxSpeed);
 			if(maxSpeed<0)
-				maxSpeed = 0;							//keep speed above 0
+				maxSpeed = 0;
 			if(maxSpeed>99)
-				maxSpeed = 99;							//keep speed below 99
+				maxSpeed = 99;
 		}
-		
-		lcd_moveto(1,0);								//OUTPUT MAX SPEED
+		//Display updated speed limit
+		lcd_moveto(1,0);
 		lcd_stringout("MAX=");
 		lcd_moveto(1,4);
 		char buf [3];
@@ -123,42 +127,44 @@ int main(void) {
 		lcd_moveto(1,6);
 		lcd_stringout(" ");
 			
-	//PHOTOTRANSISTOR AND TIMER
-	
-		if(overTime){												//Over 4 seconds
+		//PHOTOTRANSISTOR AND TIMER
+	    	//Overtime = greater than 4 seconds
+		if(overTime){
 			lcd_moveto(0,0);
 			lcd_stringout("OVER 4 SECONDS  ");
 			overTime = 0;
-			currTState = 0;											//state = 0, reset timer count
+			currTState = 0;	
 			c4 = 0;
 			c3 = 0;
 			c2 = 0;
 			c1 = 0;
-			PORTB &= ~(1<<PB5);										//TURN OFF LED			
+			//Turn off LED and Timer
+			PORTB &= ~(1<<PB5);		
 			prevTState = currTState;
-			TCCR1B &= ~(1 << CS10);									//TURN OFF TIMER
+			TCCR1B &= ~(1 << CS10):
 			TCCR1B &= ~(1 << CS12);
 		}
 		
-		if(prevTState != currTState){								//ONLY CALLED ONCE UPON STATE CHANGE
-			if(currTState == 1){									//First started
-				TCNT1 = 0; 											//Clear count
-				TCCR1B |= (1 << CS10);								// Set prescalar to 1024, start timer
+	    	//STATE CONTROL, detailed notes shown to the left
+		if(prevTState != currTState){						//ONLY CALLED ONCE UPON STATE CHANGE
+			if(currTState == 1){						//First started
+				TCNT1 = 0; 						//Clear count
+				TCCR1B |= (1 << CS10);					// Set prescalar to 1024, start timer
 				TCCR1B |= (1 << CS12);
-				PORTB |= (1<<PB5);									//Turn on LED
+				PORTB |= (1<<PB5);					//Turn on LED
 			}
-			if(currTState == 2){									//First stopped	
-				TCCR1B &= ~(1 << CS10);								//Stop timer
+			if(currTState == 2){						//First stopped	
+				TCCR1B &= ~(1 << CS10);					//Stop timer
 				TCCR1B &= ~(1 << CS12);
 				currTState = 0;		
-				PORTB &= ~(1<<PB5);									//Turn off LED
+				PORTB &= ~(1<<PB5);					//Turn off LED
 				
 				speed =(int)(((12*0.254)/(TCNT1/15625.0))*10.0);	//SPEED CALCULATOR	
-				char theSpeed[5];									//distance = 12 rows = 1.2 inches, 0.1 inches = 0.254 cm
+				char theSpeed[5];					//distance = 12 rows = 1.2 inches, 0.1 inches = 0.254 cm
 				sprintf(theSpeed, "%4d", speed);	
 				sscanf(theSpeed, "%c%c%c%c", &s4, &s3, &s2, &s1);	//store speed digits in s variables for serial
 				
-				serial_txchar('<');									//BEGIN SENDING SPEED
+				serial_txchar('<');					//BEGIN SENDING SPEED
 				if(s4 != 0){
 					char sHun [2];
 					sprintf(sHun, "%1c", s4);
@@ -190,21 +196,21 @@ int main(void) {
 				lcd_stringout(sDec);
 				serial_txchar(theSpeed[3]);
 				
-				serial_txchar('>');							//FINISH SENDING SPEED
+				serial_txchar('>');					//FINISH SENDING SPEED
 
 				lcd_moveto(0,12);
 				lcd_stringout("cm/s");		
 			}
-			prevTState = currTState;						//Update state
+			prevTState = currTState;					//Update state
 		}
 		
-		if(currTState == 1){								//State 1 = Timing
-			int theTime = (int)((TCNT1/15625.0)*1000);		//Time = count/(clocks/second) * 1000 to preserve the tenths decimal
+		if(currTState == 1){							//State 1 = Timing
+			int theTime = (int)((TCNT1/15625.0)*1000);			//Time = count/(clocks/second) * 1000 to preserve the tenths decimal
 			char theTimeChar[5];
 			sprintf(theTimeChar, "%4d", theTime);
 			sscanf(theTimeChar, "%c%c%c%c", &c4, &c3, &c2, &c1);
 		
-			char one [2];									//store digits of time into chars, print to LCD
+			char one [2];							//store digits of time into chars, print to LCD
 			sprintf(one, "%1c", c4);
 			lcd_moveto(0,0);
 			lcd_stringout(one);
@@ -230,7 +236,8 @@ int main(void) {
 	
 	
 	//SERIAL LINK
-		if(showMessage == 1){								//SHOW RECIEVED SPEED
+	    	//Show recieved speed
+		if(showMessage == 1){	
 			lcd_moveto(1,7);
 			lcd_stringout("R");
 			//lcd_moveto(1,8);
@@ -286,16 +293,18 @@ int main(void) {
 			
 			sz = 0;
 			showMessage = 0;
-
-			if((recSpeed/10.0)>maxSpeed){					//COMPARE SPEED TO SET OFF ALARM
+			
+			//Determine if alarm should be played
+			if((recSpeed/10.0)>maxSpeed){					
 					play_note();
 			}
 		}
 		
-    }//while
-}//main
+    }
+}
 
-ISR(TIMER0_COMPA_vect) {									//BUZZER TIMER
+//BUZZER TIMER
+ISR(TIMER0_COMPA_vect) {
 	if(hi == 0){
 		PORTB |= (1 << PB4);
 		hi = 1;
@@ -307,20 +316,23 @@ ISR(TIMER0_COMPA_vect) {									//BUZZER TIMER
 	
 	toneTime++;
 	if(toneTime == 3000){
-		TCCR0B &= (0 << CS02);								//enable prescalar
+		TCCR0B &= (0 << CS02);							
 		TCCR0B &= (0 << CS01);
 		TCCR0B &= (0 << CS00);
 		finished = 1;
 	}
 }
 
-ISR(TIMER1_COMPA_vect){										//SPEED TIMER
+//SPEED TIMER
+ISR(TIMER1_COMPA_vect){									
 		overTime = 1; 
 }
 
-ISR(PCINT2_vect){											//state: 0 = wait for start timing, 1 = started timing, 2 = stop timing, need to restart
+//STATE CHANGE INTERRUPT: 0 = wait for start timing, 1 = started timing, 2 = stop timing, need to restart
+ISR(PCINT2_vect){									
 	photInput = PIND;
-	if((photInput &(1<<PD2)) == 0){							//Check start PR
+	//START state
+	if((photInput &(1<<PD2)) == 0){	
 		if(prevTState == 0){
 			currTState = 1;
 		}	
@@ -330,7 +342,8 @@ ISR(PCINT2_vect){											//state: 0 = wait for start timing, 1 = started timi
 		firstP = 0;
 	}	
 	
-	if((photInput &(1<<PD3)) == 0){							//Check stop PR
+	//STOP state
+	if((photInput &(1<<PD3)) == 0){	
 		if(prevTState == 1){
 			currTState = 2;
 		}	
@@ -341,9 +354,10 @@ ISR(PCINT2_vect){											//state: 0 = wait for start timing, 1 = started timi
 	}
 }
 
-ISR(PCINT1_vect){											//ENCODER INTERRUPT
+//ENCODER INTERRUPT
+ISR(PCINT1_vect){									
 
-		int nmaxSpeed = 0; 									//Store the number the speed will increment by
+		int nmaxSpeed = 0;
 		rotInput = PINC;
 		if(rotInput & (1<<PC1))
 			rotA = 1;
@@ -402,10 +416,10 @@ ISR(PCINT1_vect){											//ENCODER INTERRUPT
 				nmaxSpeed=-1;
 				}
 		}
-		if(nmaxSpeed != 0)									//If max Speed will be incremented, flag rotChanged
+		if(nmaxSpeed != 0)									
 			rotChanged = 1;
 		else
 			rotChanged = 0;
-		maxSpeed = maxSpeed + nmaxSpeed;					//Update max speed
-		oldRot = newRot;									//Update rotary encoder state
+		maxSpeed = maxSpeed + nmaxSpeed;
+		oldRot = newRot;								
 }
