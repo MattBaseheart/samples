@@ -1,0 +1,22 @@
+Number of persons: 4
+------------------------------
+Espiritu, Vince
+2/8/1998
+Email (School): vespirit@usc.edu
+Phone (Mobile): 818-297-7969
+------------------------------
+Louis-Dreyfus, Julia Scarlett Elizabeth
+1/13/1961
+Email (Gmail): something@email.com
+Phone (Office): 310-291-7482
+------------------------------
+Van Nostrand, Martin
+7/24/1949
+Email (Yahoo): myemail@yahoo.com
+Phone (Home): 224-432-58
+------------------------------
+Burbank, Truman
+1/17/1962
+Email (Official): document@info.edu
+Phone (Work): 213-517-9989
+------------------------------
