@@ -1,12 +1,12 @@
-EQ (Spring 2021)
+EQ (Spring 2021) - eq.py is the "Main" file
 
 This is an example of Python programming implementing audio processing using multithreading and a SoX library wrapper. A 5-layer cascaded filter was designed and then implemented in this program. EQ.py is the main code, all other files in this directory are for testing or providing audio files. Visualizations of processed audio of various types can be found in the Evaluation Images folder.
 
-AUDIO_EFFECTS (Spring 2021)
+AUDIO_EFFECTS (Spring 2021) - applyFX.py is the "Main" file
 
 This is an example of Python programming implementing audio filtering using the SciPy Library. ApplyFX.py is the main code, all other files in this directory are audio testing files.
 
-LAB 10 (Fall 2019)
+LAB 10 (Fall 2019) - SpeedTrap.c is the "Main" file
 
 This is an example of C programming. SpeedTrap.c is the main file used in the project, all others were used as support code.
 This project was run on an Arduino, where external hardware were connected to create a "Speed Trap". 2 Photoresitors sensed the
