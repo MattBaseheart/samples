@@ -20,6 +20,6 @@ MOTOR_CONTROL (Fall 2020) - motor_control_full.py is the "main" file
 This is an example of Python programming controlling motors. This folder contains the code developed and a script developed to test
 and debug the code. This was done on a Raspberry Pi with two stepper motors attached via shield.
 
-CONTACT DATABASE (Spring 2020)
+CONTACT DATABASE (Spring 2020) - network.cpp is the "main" file
 
 This is an example of C++ programming used to manage a database containing non-primitive data types/structures. This code is the work of both myself and a colleague.
