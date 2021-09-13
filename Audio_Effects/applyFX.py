@@ -1,8 +1,6 @@
 from pysndfx import AudioEffectsChain
-#from playsound import playsound
 import datetime
 import time
-#from pydub import AudioSegment
 from queue import Queue
 from threading import Thread
 import pygame
@@ -12,14 +10,7 @@ import serial
 import json
 import sys
 from pynodered import node_red
-#
-#SERIAL COMMS THREAD
 
-#@node_red(category="pyfuncs")
-#def getMess(node, msg):
-#    msg['payload'] = str(msg['payload'])
-#    print(msg['payload'])
-#    return msg
 
 LPF = 16100
 REVERB = 0
@@ -34,11 +25,6 @@ def receiving(ser):
 	global last_received
 	input_str = ser.readLine()
 	last_received = input_str.decode('utf-8').strip()
-#	while True:
- #       	if (ser.inWaiting() > 0):
-  #          		buffer += ser.readline().decode('utf-8').rstrip()
-  #          		if '\n' in buffer:
-   #             		last_received, buffer = buffer.split('\n')[-2:]
 
 def producer(out_q, check_me):
 	#SET INITIAL FX CONDITIONS
@@ -58,14 +44,11 @@ def producer(out_q, check_me):
 	data = None
 
 	while True:
-		#TODO GET SENSOR VALS-------------------------------------------------------
+		#GET SENSOR VALS-------------------------------------------------------
 		while not last_received:
             		continue
-		#last_received = getMess(node,msg)
-		# print("Got data in producer thread")
-		# print(last_received)
 		data = json.loads(last_received)
-		# if data:
+
 		LPF = (data['distance1'])* (15000/100) + 1
 		REVERB = data['distance2']
 		TREM_FREQ =(data['distance3']) * (10/100) + 1
@@ -86,9 +69,6 @@ def producer(out_q, check_me):
 		x = x + 1
 		if(x == 8):
 			x = 0
-
-		# if last_received:
-			# data = json.loads(last_received)
 
 		#WAIT HERE UNTIL CONSUMER HAS READ THE LAST FILE
 		while(check_me.get() != "GO AHEAD"):
@@ -132,7 +112,7 @@ last_received = ''
 os.getcwd()
 q = Queue()
 check = Queue()
-#UNCOMMENT THESE SERIAL LINES to accpept serial comms and start the thread===============
+#accpept serial comms and start the thread===============
 ser = serial.Serial(port='/dev/ttyACM0', baudrate=9600, timeout=5)
 
 t1 = Thread(target = consumer, args = (q,check,  ))
@@ -156,43 +136,3 @@ while True:
 		HPF = 20
 		BASSBOOST = 0
 		
-	#if last_received:
-		#print(last_received)
-
-# t0 = Thread(target = receiving, args=(ser,)).start()
-# #-----------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-#SCRATCH WORK/USEFUL DEBUG/TEST LINES
-
-#Testing Input
-#rlevel = (int)(input("Reverb level: "))
-#bplo = (int)(input("Bandpass Low Freq: "))
-#bphi = (int)(input("Bandpass High Freq: "))
-#lp = (int)(input("Lowpass: "))
-#eqf = (int)(input("EQ Boost Freq: "))
-#dlevel = (int)(input("Delay level: "))
-
-#Timing
-#start = datetime.datetime.now()
-#print(datetime.datetime.now() - start)
-
-#MIXING 4 PARTS TOGETHER - this works but takes too long, wanted buffer to remain fairly small
-#Mix 4 parts with volume
-#inst1 = AudioSegment.from_file(pad[x])
-#inst2 = AudioSegment.from_file(glock[x])
-#inst3 = AudioSegment.from_file(marimba[x])
-#inst4 = AudioSegment.from_file(frogs[x])
-#comb1 = inst1.overlay(inst2)
-#comb2 = comb1.overlay(inst3)
-#comb3 = comb2.overlay(inst4)
-#comb3.export(infile[x], format = 'wav')
